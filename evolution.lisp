@@ -15,6 +15,15 @@
   dir
   genes)
 
+(defparameter *animals*
+  (list (make-animal :x (ash *width* -1)
+                     :y (ash *height* -1)
+                     :energy 1000
+                     :dir 0
+                     :genes (loop repeat 8
+                                  collecting (1+ (random 10)))))
+  "All the animals.")
+
 (defun random-plant (left top width height)
   "Create a new plant in a region of the world."
   (let ((pos (cons (+ left
