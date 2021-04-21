@@ -37,3 +37,34 @@
   "Add two plants to the world; one in the jungle and one in the world."
   (apply #'random-plant *jungle*)
   (random-plant 0 0 *width* *height*))
+
+(defun move (animal)
+  "Move ANIMAL based on its DIR."
+  (let ((dir (animal-dir animal))
+        (x (animal-x animal))
+        (y (animal-y animal)))
+    (setf (animal-x animal)
+          (mod (+ x
+                  (cond ((and (>= dir 2)
+                              (< dir 5))
+                         1)
+                        ((or (= dir 1)
+                             (= dir 5))
+                         0)
+                        (t
+                         -1))
+                  *width*)
+               *width*))
+    (setf (animal-y animal)
+          (mod (+ y
+                  (cond ((and (>= dir 0)
+                              (< dir 3))
+                         -1)
+                        ((and (>= dir 4)
+                              (< dir 7))
+                         0)
+                        (t
+                         0))
+                  *height*)
+               *height*))
+    (decf (animal-energy animal))))
