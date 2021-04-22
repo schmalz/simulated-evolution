@@ -15,6 +15,8 @@
   dir
   genes)
 
+(defparameter *reproduction-energy* 200)
+
 (defparameter *animals*
   (list (make-animal :x (ash *width* -1)
                      :y (ash *height* -1)
@@ -94,3 +96,21 @@
       (incf (animal-energy animal)
             *plant-energy*)
       (remhash pos *plants*))))
+
+(defun reproduce (animal)
+  "ANIMAL reproduces, creating a near clone of itself."
+  (let ((e (animal-energy animal)))
+    (when (>= e *reproduction-energy*)
+      (setf (animal-energy animal)
+            (ash e -1))
+      (let ((animal-nu (copy-structure animal))
+            (genes-nu (copy-list (animal-genes animal)))
+            (mutation (random 8)))
+        (setf (nth mutation genes-nu)
+              (max 1
+                    (+ (nth mutation genes-nu)
+                       (random 3)
+                       -1)))
+        (setf (animal-genes animal-nu)
+              genes-nu)
+        (push animal-nu *animals*)))))
