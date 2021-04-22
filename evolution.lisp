@@ -85,3 +85,12 @@
                     (angle (animal-genes animal)
                            x))
                  8)))))
+
+(defun eat (animal)
+  "If there is a plant at ANIMAL's location, then ANIMAL eats it."
+  (let ((pos (cons (animal-x animal)
+                   (animal-y animal))))
+    (when (gethash pos *plants*)
+      (incf (animal-energy animal)
+            *plant-energy*)
+      (remhash pos *plants*))))
