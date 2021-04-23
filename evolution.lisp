@@ -26,6 +26,8 @@
                                   collecting (1+ (random 10)))))
   "All the animals.")
 
+;;; Plants
+
 (defun random-plant (left top width height)
   "Create a new plant in a region of the world."
   (let ((pos (cons (+ left
@@ -40,6 +42,8 @@
   (apply #'random-plant *jungle*)
   (random-plant 0 0 *width* *height*))
 
+;;; Animals
+
 (defun move (animal)
   "Move ANIMAL based on its DIR."
   (let ((dir (animal-dir animal))
@@ -53,8 +57,7 @@
                         ((or (= dir 1)
                              (= dir 5))
                          0)
-                        (t
-                         -1))
+                        (t -1))
                   *width*)
                *width*))
     (setf (animal-y animal)
@@ -65,8 +68,7 @@
                         ((and (>= dir 4)
                               (< dir 7))
                          0)
-                        (t
-                         0))
+                        (t 0))
                   *height*)
                *height*))
     (decf (animal-energy animal))))
@@ -76,12 +78,12 @@
   (let ((x (random (apply #'+
                           (animal-genes animal)))))
     (labels ((angle (genes x)
-              (let ((xnu (- x
+              (let ((x-nu (- x
                             (car genes))))
-                (if (< xnu 0)
+                (if (< x-nu 0)
                   0
                   (1+ (angle (cdr genes)
-                             xnu))))))
+                             x-nu))))))
       (setf (animal-dir animal)
             (mod (+ (animal-dir animal)
                     (angle (animal-genes animal)
@@ -114,3 +116,43 @@
         (setf (animal-genes animal-nu)
               genes-nu)
         (push animal-nu *animals*)))))
+
+;;; World Update
+
+(defun update-world ()
+  "Update the entire worl."
+  (setf *animals* (remove-if (lambda (animal)
+                               (<= (animal-energy animal)
+                                   0))
+                             *animals*))
+  (mapc (lambda (animal)
+          (turn animal)
+          (move animal)
+          (eat animal)
+          (reproduce animal))
+        *animals*)
+  (add-plants))
+
+;;; Drawing
+
+(defun draw-world ()
+  "Draw the world to standard out."
+  (loop for y
+        below *height*
+        do (progn (fresh-line)
+                  (princ "|")
+                  (loop for x
+                        below *width*
+                        do (princ (cond ((some (lambda (animal)
+                                                 (and (= (animal-x animal)
+                                                         x)
+                                                      (= (animal-y animal)
+                                                         y)))
+                                               *animals*)
+                                         #\M)
+                                        ((gethash (cons x y)
+                                                  *plants*)
+                                         #\*)
+                                        (t #\space))))
+                  (princ "|"))))
+
