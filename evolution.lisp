@@ -156,3 +156,18 @@
                                         (t #\space))))
                   (princ "|"))))
 
+(defun evolution ()
+  (draw-world)
+  (fresh-line)
+  (let ((str (read-line)))
+    (cond ((equal str "quit") nil)
+          (t (let ((x (parse-integer str :junk-allowed t)))
+               (if x
+                 (loop for i
+                       below x
+                       do (update-world)
+                       if (zerop (mod i 1000))
+                         do (princ #\.))
+               (update-world))
+             (evolution))))))
+
